@@ -15,7 +15,7 @@ file_handler = RotatingFileHandler(logFilePath, maxBytes=1e6, backupCount=3)
 formatter = logging.Formatter(FORMAT)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
 
 logger.info("#")
 logger.info("################################### ADD-ON STARTED #################################################")
