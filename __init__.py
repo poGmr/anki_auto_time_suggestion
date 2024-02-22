@@ -121,13 +121,13 @@ def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2,
 def profile_did_open():
     global add_on_config
     add_on_config = mw.addonManager.getConfig(__name__)
-    logger.debug(f"Loaded add-on config from file: {add_on_config}")
     if add_on_config["logging_level"] == "DEBUG":
         logger.setLevel(logging.DEBUG)
         logger.debug(f"Logging has been set to DEBUG level.")
     if add_on_config["logging_level"] == "INFO":
         logger.setLevel(logging.INFO)
         logger.info(f"Logging has been set to INFO level.")
+    logger.debug(f"Loaded add-on config from file: {add_on_config}")
 
 
 gui_hooks.profile_did_open.append(profile_did_open)
