@@ -29,6 +29,7 @@ class Manager:
         self.note = self.card.note()
         self.reviews_times = self.get_reviews_times()
         self.reviews_times = self.clean_up_reviews_times()
+
         self.low_quantile, self.high_quantile = self.get_quantiles()
 
     def get_reviews_times(self):
@@ -47,6 +48,10 @@ class Manager:
         return mw.col.db.list(query)
 
     def clean_up_reviews_times(self):
+        reviews_times_n = len(self.reviews_times)
+        if reviews_times_n < 2:
+            logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
+            return
         min_time = min(self.reviews_times)
         max_time = max(self.reviews_times)
         logger.debug(f"Min. / Max. times to remove: {min_time} / {max_time}")
@@ -55,6 +60,10 @@ class Manager:
         return reviews_times
 
     def get_quantiles(self):
+        reviews_times_n = len(self.reviews_times)
+        if reviews_times_n < 4:
+            logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
+            return
         quantiles_times = [round(q) for q in quantiles(self.reviews_times, n=4)]
         low_quantile = quantiles_times[0]
         high_quantile = quantiles_times[2]
@@ -75,14 +84,18 @@ class Manager:
         return 4
 
     def get_buttons(self):
-        c_time_taken = int(self.card.time_taken())
-        c_type = self.card.type
-        c_queue = self.card.queue
-        logger.debug(f"Card time taken: {c_time_taken}, card type: {c_type}, card queue: {c_queue}")
         again_b = (1, 'Again')
         hard_b = (2, 'Hard')
         good_b = (3, 'Good')
         easy_b = (4, 'Easy')
+        reviews_times_n = len(self.reviews_times)
+        if reviews_times_n < 100:
+            logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
+            return again_b, hard_b, good_b, easy_b
+        c_time_taken = int(self.card.time_taken())
+        c_type = self.card.type
+        c_queue = self.card.queue
+        logger.debug(f"Card time taken: {c_time_taken}, card type: {c_type}, card queue: {c_queue}")
         if c_type in (0, 2) and c_queue in (0, 2):
             if c_time_taken > self.high_quantile:
                 hard_b = (2, "<b><u>HARD</u></b>")
