@@ -1,4 +1,5 @@
 /auto_time_suggestion.log*
 /meta.json
-/.idea/*
+/.idea
 /quick_test.py
+/lib
