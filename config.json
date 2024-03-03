@@ -1,3 +1,4 @@
 {
-  "logging_level": "INFO"
+  "logging_level": "INFO",
+  "dump_data": false
 }

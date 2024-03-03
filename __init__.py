@@ -32,6 +32,13 @@ class Manager:
 
         self.low_quantile, self.high_quantile = self.get_quantiles()
 
+    def save_raw_data(self, data, model_id, card_ord):
+        filename = f"{model_id}_{card_ord}.txt"
+        with open(filename, mode="w", encoding="utf-8") as file:
+            for line in data:
+                file.write(str(line) + "\n")
+        logger.debug(f"Saved data to file {filename}")
+
     def get_reviews_times(self):
         card_ord = self.card.ord  # 0,1,2 Type of cards, EN->PL, PL->EN, EN->Write, etc,
         model_id = self.note.note_type()["id"]  # Words, Grammar, Spelling, etc.
@@ -45,7 +52,10 @@ class Manager:
                 revlog.ease!='1' AND
                 revlog.type='1'
                 """
-        return mw.col.db.list(query)
+        result = mw.col.db.list(query)
+        if add_on_config["dump_data"]:
+            self.save_raw_data(result, model_id, card_ord)
+        return result
 
     def clean_up_reviews_times(self):
         reviews_times_n = len(self.reviews_times)
