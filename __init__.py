@@ -3,7 +3,7 @@ import os
 from aqt.reviewer import Reviewer
 from anki.cards import Card
 from typing import Literal
-from statistics import quantiles
+from statistics import quantiles, mean, mode, median
 from aqt import mw
 from aqt import gui_hooks
 from logging.handlers import RotatingFileHandler
@@ -29,7 +29,6 @@ class Manager:
         self.note = self.card.note()
         self.reviews_times = self.get_reviews_times()
         self.reviews_times = self.clean_up_reviews_times()
-
         self.low_quantile, self.high_quantile = self.get_quantiles()
 
     def save_raw_data(self, data, model_id, card_ord):
@@ -58,15 +57,32 @@ class Manager:
         return result
 
     def clean_up_reviews_times(self):
-        reviews_times_n = len(self.reviews_times)
-        if reviews_times_n < 2:
+        reviews_times = self.reviews_times.copy()
+        reviews_times_n = len(reviews_times)
+        if reviews_times_n < 20:
             logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
             return
-        min_time = min(self.reviews_times)
-        max_time = max(self.reviews_times)
-        logger.debug(f"Min. / Max. times to remove: {min_time} / {max_time}")
-        reviews_times = [x for x in self.reviews_times if x != min_time and x != max_time]
-        logger.debug(f"Before / After clean up reviews_times: {len(self.reviews_times)} / {len(reviews_times)}")
+        debug_output = "Before clean up: "
+        debug_output += f"n {reviews_times_n} "
+        debug_output += f"min {min(reviews_times)} "
+        debug_output += f"mean {round(mean(reviews_times))} "
+        debug_output += f"mode {mode(reviews_times)} "
+        debug_output += f"median {round(median(reviews_times))} "
+        debug_output += f"max {max(reviews_times)}"
+        logger.debug(debug_output)
+        first_5_per = int(0.05 * reviews_times_n)
+        last_5_per = int(0.95 * reviews_times_n)
+        reviews_times.sort()
+        reviews_times = reviews_times[first_5_per:last_5_per]
+        reviews_times_n = len(reviews_times)
+        debug_output = "After clean up:  "
+        debug_output += f"n {reviews_times_n} "
+        debug_output += f"min {min(reviews_times)} "
+        debug_output += f"mean {round(mean(reviews_times))} "
+        debug_output += f"mode {mode(reviews_times)} "
+        debug_output += f"median {round(median(reviews_times))} "
+        debug_output += f"max {max(reviews_times)}"
+        logger.debug(debug_output)
         return reviews_times
 
     def get_quantiles(self):
