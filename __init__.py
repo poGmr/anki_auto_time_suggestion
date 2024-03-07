@@ -27,6 +27,8 @@ add_on_config: dict = {}
 def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3, 4]], reviewer: Reviewer, card: Card):
     m1 = Manager(card, add_on_config, logger)
     buttons = m1.get_buttons()
+    if buttons is None:
+        return buttons_tuple
     return buttons
 
 

@@ -109,7 +109,7 @@ class Manager:
         reviews_times_n = len(self.reviews_times)
         if reviews_times_n < 100:
             self.logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
-            return again_b, hard_b, good_b, easy_b
+            return None
         c_time_taken = int(self.card.time_taken())
         c_type = self.card.type
         c_queue = self.card.queue
