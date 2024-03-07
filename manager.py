@@ -1,3 +1,4 @@
+import os.path
 from statistics import quantiles, mean, mode, median
 from anki.cards import Card
 from aqt import mw
@@ -15,11 +16,17 @@ class Manager:
         self.low_quantile, self.high_quantile = self.get_quantiles()
 
     def save_raw_data(self, data, model_id, card_ord):
-        filename = f"{model_id}_{card_ord}.txt"
-        with open(filename, mode="w", encoding="utf-8") as file:
+
+        root_dir = os.path.dirname(os.path.realpath(__file__))
+        user_data_dir = os.path.join(root_dir, "user_data")
+        user_data_dir_filename = os.path.join(user_data_dir, f"raw_times_{model_id}_{card_ord}.txt")
+        if not os.path.exists(user_data_dir):
+            os.mkdir(user_data_dir)
+
+        with open(user_data_dir_filename, mode="w") as file:
             for line in data:
                 file.write(str(line) + "\n")
-        self.logger.debug(f"Saved data to file {filename}")
+        self.logger.debug(f"Saved data to file {user_data_dir_filename}")
 
     def get_reviews_times(self):
         card_ord = self.card.ord  # 0,1,2 Type of cards, EN->PL, PL->EN, EN->Write, etc,
@@ -35,6 +42,8 @@ class Manager:
                 revlog.type='1'
                 """
         result = mw.col.db.list(query)
+        if result is None:
+            return []
         if self.add_on_config["dump_data"]:
             self.save_raw_data(result, model_id, card_ord)
         return result
@@ -44,7 +53,7 @@ class Manager:
         reviews_times_n = len(reviews_times)
         if reviews_times_n < 20:
             self.logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
-            return
+            return []
         debug_output = "Before clean up: "
         debug_output += f"n {reviews_times_n} "
         debug_output += f"min {min(reviews_times)} "
@@ -72,7 +81,7 @@ class Manager:
         reviews_times_n = len(self.reviews_times)
         if reviews_times_n < 4:
             self.logger.debug(f"reviews_times has too few elements: {reviews_times_n}")
-            return
+            return None, None
         quantiles_times = [round(q) for q in quantiles(self.reviews_times, n=4)]
         low_quantile = quantiles_times[0]
         high_quantile = quantiles_times[2]
@@ -105,7 +114,7 @@ class Manager:
         c_type = self.card.type
         c_queue = self.card.queue
         self.logger.debug(f"Card time taken: {c_time_taken}, card type: {c_type}, card queue: {c_queue}")
-        if c_type in (0, 2) and c_queue in (0, 2):
+        if c_type in (0, 2) and c_queue in (0, 2, 4):
             if c_time_taken > self.high_quantile:
                 hard_b = (2, "<b><u>HARD</u></b>")
                 Reviewer._defaultEase = self._defaultEase_2

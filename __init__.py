@@ -11,7 +11,7 @@ from .manager import Manager
 logger = logging.getLogger(__name__)
 FORMAT = "%(asctime)s [%(filename)s][%(funcName)s:%(lineno)s][%(levelname)s]: %(message)s"
 logFilePath = os.path.join(os.path.dirname(os.path.realpath(__file__)), "auto_time_suggestion.log")
-file_handler = RotatingFileHandler(logFilePath, maxBytes=10 * 1024, backupCount=3)
+file_handler = RotatingFileHandler(logFilePath, maxBytes=10 * 1024 * 1024, backupCount=3)
 formatter = logging.Formatter(FORMAT)
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
@@ -31,7 +31,7 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
-    logger.debug(f"User pressed button: {ease}. Auto button was: {Reviewer._defaultEase()}")
+    logger.debug(f"User pressed button: {ease}. Auto button was: {Reviewer._defaultEase}")
 
 
 def profile_did_open():
