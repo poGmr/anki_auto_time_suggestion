@@ -24,12 +24,30 @@ logger.info("#")
 add_on_config: dict = {}
 
 
+def get_all_included_decks_ids(deck_names: dict) -> list:
+    filtered_keys = {key: value for key, value in deck_names.items() if value}
+    result: list = []
+    decks = mw.col.decks.all()
+    for deck in decks:
+        if deck["name"] in filtered_keys.keys():
+            result.append(deck["id"])
+    return result
+
+
 def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3, 4]], reviewer: Reviewer, card: Card):
+    global add_on_config
+    included_decks_ids: list = get_all_included_decks_ids(add_on_config["includedDecks"])
+    logger.debug(f"included_decks_ids {included_decks_ids}")
+    if card.odid not in included_decks_ids:
+        logger.debug(f"Not included Deck ID: {card.did}")
+        return buttons_tuple
+
     m1 = Manager(card, add_on_config, logger)
     buttons = m1.get_buttons()
     if buttons is None:
         return buttons_tuple
-    return buttons
+    else:
+        return buttons
 
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
