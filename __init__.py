@@ -63,7 +63,7 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
-    logger.debug(f"User pressed button: {ease}. Auto button was: {Reviewer._defaultEase}")
+    logger.debug(f"User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
 
 
 def profile_did_open():
