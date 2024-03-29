@@ -34,12 +34,24 @@ def get_all_included_decks_ids(deck_names: dict) -> list:
     return result
 
 
+def _defaultEase_3() -> int:
+    return 3
+
+
 def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3, 4]], reviewer: Reviewer, card: Card):
     global add_on_config
     included_decks_ids: list = get_all_included_decks_ids(add_on_config["includedDecks"])
     logger.debug(f"included_decks_ids {included_decks_ids}")
-    if card.odid not in included_decks_ids:
-        logger.debug(f"Not included Deck ID: {card.did}")
+    c_type = card.type
+    c_queue = card.queue
+
+    reviewer._defaultEase = _defaultEase_3
+    logger.debug(f"c_type {c_type} c_queue {c_queue} card.did {card.did} card.odid {card.odid}")
+    if card.odid == 0 and card.did not in included_decks_ids:
+        logger.debug(f"Deck ID {card.did} is not included in add-on.")
+        return buttons_tuple
+    if card.odid != 0 and card.odid not in included_decks_ids:
+        logger.debug(f"Original deck ID {card.odid} is not included in add-on.")
         return buttons_tuple
 
     m1 = Manager(card, add_on_config, logger)
