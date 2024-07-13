@@ -1,12 +1,1 @@
-{
-  "logging_level": "INFO",
-  "dump_data": false,
-  "includedDecks": {
-    "GCA": false,
-    "d-Grammar-Activities": false,
-    "d-Grammar-Exercises": false,
-    "d-Words-EN->PL": true,
-    "d-Words-EN->Write": true,
-    "d-Words-PL->EN": true
-  }
-}
+{}
