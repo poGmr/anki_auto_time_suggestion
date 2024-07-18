@@ -30,7 +30,8 @@ class AddonConfig:
                 self.raw["decks"][d_id] = {
                     "name": deck.name,
                     "enabled": False,
-                    "mode": "group"
+                    "primary_mode": "note",
+                    "secondary_mode": "none"
                 }
 
     def update_decks_in_add_on_config(self):

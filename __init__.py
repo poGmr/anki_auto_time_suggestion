@@ -45,7 +45,7 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
     global add_on_config
     c_type = card.type
     c_queue = card.queue
-    logger.debug(f"c_type {c_type} c_queue {c_queue} card.did {card.did} card.odid {card.odid}")
+    logger.debug(f"[{card.id}] c_type {c_type} c_queue {c_queue} card.did {card.did} card.odid {card.odid}")
 
     if card.odid == 0:
         did = str(card.did)
@@ -53,9 +53,11 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
         did = str(card.odid)
 
     if not add_on_config.raw['decks'][did]['enabled']:
-        logger.debug(f"Deck ID {did} is not included in add-on.")
+        logger.debug(f"[{card.id}] Deck ID {did} is not included in add-on.")
         return buttons_tuple
-    m1 = Manager(card, logger)
+    primary_mode = add_on_config.raw['decks'][did]['primary_mode']
+    secondary_mode = add_on_config.raw['decks'][did]['secondary_mode']
+    m1 = Manager(card, primary_mode, secondary_mode, logger)
     decision = m1.get_decision()
     b1 = (1, 'Again')
     b2 = (2, 'Hard')
@@ -78,7 +80,7 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
     global add_on_config
-    logger.debug(f"User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
+    logger.debug(f"[{card.id}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
 
 
 def profile_did_open():
