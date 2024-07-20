@@ -18,7 +18,7 @@ def initialize_logger():
         formatter = logging.Formatter(log_format)
         file_handler.setFormatter(formatter)
         result.addHandler(file_handler)
-        result.setLevel(logging.DEBUG)
+        result.setLevel(logging.INFO)
     return result
 
 
@@ -80,7 +80,7 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
     global add_on_config
-    logger.debug(f"[{card.id}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
+    logger.info(f"[{card.id}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
 
 
 def profile_did_open():
