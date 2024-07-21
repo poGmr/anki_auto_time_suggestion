@@ -2,7 +2,6 @@ import logging
 import os
 from aqt.reviewer import Reviewer
 from anki.cards import Card
-from anki.decks import Deck
 from typing import Literal
 from aqt import gui_hooks
 from aqt import mw
@@ -27,19 +26,19 @@ def initialize_logger():
 add_on_config: AddonConfig
 
 
-def _defaultEase_1() -> int:
+def _default_ease_1() -> int:
     return 1
 
 
-def _defaultEase_2() -> int:
+def _default_ease_2() -> int:
     return 2
 
 
-def _defaultEase_3() -> int:
+def _default_ease_3() -> int:
     return 3
 
 
-def _defaultEase_4() -> int:
+def _default_ease_4() -> int:
     return 4
 
 
@@ -84,16 +83,16 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
     b4 = (4, 'Easy')
     if decision == 1:
         b1 = (1, "<b><u>AGAIN</u></b>")
-        reviewer._defaultEase = _defaultEase_1
+        reviewer._defaultEase = _default_ease_1
     if decision == 2:
         b2 = (2, "<b><u>HARD</u></b>")
-        reviewer._defaultEase = _defaultEase_2
+        reviewer._defaultEase = _default_ease_2
     if decision == 3:
         b3 = (3, "<b><u>GOOD</u></b>")
-        reviewer._defaultEase = _defaultEase_3
+        reviewer._defaultEase = _default_ease_3
     if decision == 4:
         b4 = (4, "<b><u>EASY</u></b>")
-        reviewer._defaultEase = _defaultEase_4
+        reviewer._defaultEase = _default_ease_4
     return b1, b2, b3, b4
 
 
@@ -102,8 +101,9 @@ def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2,
     deck = mw.col.decks.get(did=card.did)
     card_type_name = CARD_TYPE_MAP.get(card.type, "unknown")
     card_queue_name = CARD_QUEUE_MAP.get(card.queue, "unknown")
-    logger.info(
-        f"[{deck['name']}][{card_type_name}][{card_queue_name}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
+    logger_output = f"[{deck['name']}][{card_type_name}][{card_queue_name}] User pressed button: {ease}."
+    logger_output += f" Auto button was: {reviewer._defaultEase()}"
+    logger.info(logger_output)
 
 
 def profile_did_open():

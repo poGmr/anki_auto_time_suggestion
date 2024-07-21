@@ -20,8 +20,12 @@ class Manager:
     def get_review_times(self):
         card_ord = self.card.ord  # 0,1,2 Type of cards, EN->PL, PL->EN, EN->Write, etc,
         model_id = self.note.note_type()["id"]  # Words, Grammar, Spelling, etc.
-        self.logger.debug(
-            f"[{self.card.id}] Card ID: {self.card.id}, Note type model id: {model_id}, Card type ID: {card_ord}, Selected mode: {self.current_mode}")
+
+        logger_output = f"[{self.card.id}] Card ID: {self.card.id}, Note type model id: {model_id},"
+        logger_output += f" Card type ID: {card_ord}, Selected mode: {self.current_mode}"
+        self.logger.debug(logger_output)
+
+        query: str = ""
         if self.current_mode == "card":
             query = f"""
                     SELECT revlog.time
@@ -78,19 +82,22 @@ class Manager:
         return reviews_times
 
     def get_quantiles(self, reviews_times):
-        reviews_times_n = len(reviews_times)
         quantiles_times = [round(q) for q in quantiles(reviews_times, n=4)]
         low_quantile = quantiles_times[0]
         high_quantile = quantiles_times[2]
-        self.logger.debug(
-            f"[{self.card.id}] quantiles_times: {quantiles_times}, low_quantile: {low_quantile}, high_quantile: {high_quantile}")
+
+        logger_output = f"[{self.card.id}] quantiles_times: {quantiles_times},"
+        logger_output += f" low_quantile: {low_quantile}, high_quantile: {high_quantile}"
+        self.logger.debug(logger_output)
+
         return low_quantile, high_quantile
 
     def get_decision(self) -> int:
         reviews_times = self.get_review_times()
         if len(reviews_times) < 20:
-            self.logger.debug(
-                f"[{self.card.id}] Not enough cards' reviews: {len(reviews_times)} - switching to '{self.secondary_mode}' mode")
+            logger_output = f"[{self.card.id}] Not enough cards' reviews: {len(reviews_times)}"
+            logger_output += f" - switching to '{self.secondary_mode}' mode"
+            self.logger.debug(logger_output)
             self.current_mode = self.secondary_mode
             reviews_times = self.get_review_times()
         if self.current_mode == "none":
