@@ -2,8 +2,10 @@ import logging
 import os
 from aqt.reviewer import Reviewer
 from anki.cards import Card
+from anki.decks import Deck
 from typing import Literal
 from aqt import gui_hooks
+from aqt import mw
 from logging.handlers import RotatingFileHandler
 from .manager import Manager
 from .addon_config import AddonConfig
@@ -39,6 +41,23 @@ def _defaultEase_3() -> int:
 
 def _defaultEase_4() -> int:
     return 4
+
+
+CARD_TYPE_MAP = {
+    0: "new",
+    1: "learning",
+    2: "review",
+    3: "relearning"
+}
+CARD_QUEUE_MAP = {
+    -3: "suspended",
+    -2: "buried",
+    -1: "user buried",
+    0: "new",
+    1: "learning",
+    2: "review",
+    3: "day learning"
+}
 
 
 def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3, 4]], reviewer: Reviewer, card: Card):
@@ -80,7 +99,11 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
     global add_on_config
-    logger.info(f"[{card.id}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
+    deck = mw.col.decks.get(did=card.did)
+    card_type_name = CARD_TYPE_MAP.get(card.type, "unknown")
+    card_queue_name = CARD_QUEUE_MAP.get(card.queue, "unknown")
+    logger.info(
+        f"[{deck['name']}][{card_type_name}][{card_queue_name}] User pressed button: {ease}. Auto button was: {reviewer._defaultEase()}")
 
 
 def profile_did_open():

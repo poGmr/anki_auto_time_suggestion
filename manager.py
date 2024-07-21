@@ -1,11 +1,12 @@
 from statistics import quantiles, mean, mode, median
 from anki.cards import Card
 from aqt import mw
+import logging
 
 
 class Manager:
-    def __init__(self, card: Card, primary_mode, secondary_mode: str, logger):
-        self.logger = logger
+    def __init__(self, card: Card, primary_mode, secondary_mode: str, logger: logging.Logger):
+        self.logger: logging.Logger = logger
         self.card = card
         self.note = self.card.note()
         self.primary_mode = primary_mode
@@ -88,7 +89,7 @@ class Manager:
     def get_decision(self) -> int:
         reviews_times = self.get_review_times()
         if len(reviews_times) < 20:
-            self.logger.warn(
+            self.logger.debug(
                 f"[{self.card.id}] Not enough cards' reviews: {len(reviews_times)} - switching to '{self.secondary_mode}' mode")
             self.current_mode = self.secondary_mode
             reviews_times = self.get_review_times()
