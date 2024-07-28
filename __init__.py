@@ -23,9 +23,6 @@ def initialize_logger():
     return result
 
 
-add_on_config: AddonConfig
-
-
 def _default_ease_1() -> int:
     return 1
 
@@ -70,11 +67,12 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
     else:
         did = str(card.odid)
 
-    if not add_on_config.raw['decks'][did]['enabled']:
+    if not add_on_config.get_deck_state(did=did, key="enabled"):
         logger.debug(f"[{card.id}] Deck ID {did} is not included in add-on.")
+        reviewer._defaultEase = _default_ease_3
         return buttons_tuple
-    primary_mode = add_on_config.raw['decks'][did]['primary_mode']
-    secondary_mode = add_on_config.raw['decks'][did]['secondary_mode']
+    primary_mode = add_on_config.get_deck_state(did=did, key="primary_mode")
+    secondary_mode = add_on_config.get_deck_state(did=did, key="secondary_mode")
     m1 = Manager(card, primary_mode, secondary_mode, logger)
     decision = m1.get_decision()
     b1 = (1, 'Again')
@@ -97,7 +95,6 @@ def reviewer_will_init_answer_buttons(buttons_tuple: tuple[bool, Literal[1, 2, 3
 
 
 def reviewer_did_answer_card(reviewer: Reviewer, card: Card, ease: Literal[1, 2, 3, 4]):
-    global add_on_config
     deck = mw.col.decks.get(did=card.did)
     card_type_name = CARD_TYPE_MAP.get(card.type, "unknown")
     card_queue_name = CARD_QUEUE_MAP.get(card.queue, "unknown")
@@ -111,10 +108,11 @@ def profile_did_open():
     logger.info("#")
     logger.info("################################### ADD-ON STARTED #################################################")
     logger.info("#")
-    add_on_config = AddonConfig(logger)
+    add_on_config = AddonConfig(logger=logger)
 
 
 logger = initialize_logger()
+add_on_config: AddonConfig
 gui_hooks.profile_did_open.append(profile_did_open)
 gui_hooks.reviewer_will_init_answer_buttons.append(reviewer_will_init_answer_buttons)
 gui_hooks.reviewer_did_answer_card.append(reviewer_did_answer_card)
